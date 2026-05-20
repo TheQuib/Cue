@@ -19,7 +19,6 @@
           - curl
           - gnupg2
           - apt-transport-https
-          - software-properties-common
           - python3-docker
           - cec-utils
           - iptables
