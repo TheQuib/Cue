@@ -1,0 +1,12 @@
+services:
+  cue-app:
+    image: ghcr.io/thequib/cue:latest
+    container_name: cue
+    volumes:
+      - ./config.yml:/app/config.yml
+    devices:
+      - "/dev/cec0:/dev/cec0"
+    ports:
+      - "5000:5000"
+    privileged: true
+    restart: unless-stopped

@@ -1,0 +1,25 @@
+all:
+  hosts:
+    ad-br-tv-l:
+      ansible_host: 192.168.1.101
+      ansible_user: pi
+      tv_id: ad-br-tv-l
+      pi_hdmi_port: 2
+      content_hdmi_port: 1
+      on_delay: 1
+      input_delay: 3
+      off_delay: 2
+      # Set cue_api_key as a Semaphore secret, not here
+      # semaphore_ip: 192.168.1.50
+    ad-br-tv-c:
+      ansible_host: 192.168.1.102
+      ansible_user: pi
+      tv_id: ad-br-tv-c
+      pi_hdmi_port: 2
+      content_hdmi_port: 1
+    ad-br-tv-r:
+      ansible_host: 192.168.1.103
+      ansible_user: pi
+      tv_id: ad-br-tv-r
+      pi_hdmi_port: 2
+      content_hdmi_port: 1

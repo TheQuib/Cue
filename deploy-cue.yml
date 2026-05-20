@@ -1,0 +1,117 @@
+---
+- name: Deploy Cue
+  hosts: '*'
+  become: yes
+  become_user: root
+
+  tasks:
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        state: latest
+        update_cache: true
+        name:
+          - ca-certificates
+          - curl
+          - gnupg2
+          - apt-transport-https
+          - software-properties-common
+          - python3-docker
+          - cec-utils
+          - iptables
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=arm64] https://download.docker.com/linux/debian bookworm stable
+        state: present
+
+    - name: Install Docker packages
+      apt:
+        state: latest
+        update_cache: true
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add user pi to docker group
+      user:
+        name: 'pi'
+        groups: docker
+        append: yes
+
+    # --- Firewall ---
+    - name: Allow port 5000 from Semaphore server only
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "{{ api_port | default(5000) }}"
+        source: "{{ semaphore_ip }}"
+        jump: ACCEPT
+
+    - name: Block port 5000 from all other sources
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "{{ api_port | default(5000) }}"
+        jump: DROP
+
+    - name: Save iptables rules
+      shell: iptables-save > /etc/iptables/rules.v4
+      args:
+        creates: /etc/iptables/rules.v4
+
+    # --- Project directory ---
+    - name: Create directory for Cue
+      file:
+        path: /home/pi/cue
+        state: directory
+        owner: pi
+        group: pi
+        mode: '0755'
+
+    - name: Generate config.yml from template
+      template:
+        src: config.yml.j2
+        dest: /home/pi/cue/config.yml
+        owner: pi
+        group: pi
+        mode: '0600'
+
+    - name: Copy docker-compose.yml
+      copy:
+        src: ./docker-compose.yml
+        dest: /home/pi/cue/docker-compose.yml
+
+    - name: Pull latest container image
+      command: docker compose pull
+      args:
+        chdir: /home/pi/cue/
+
+    - name: Run the container
+      command: docker compose up -d --force-recreate
+      args:
+        chdir: /home/pi/cue/
+
+    - name: Ensure container is running
+      docker_container:
+        name: cue
+        state: started
+        restart_policy: unless-stopped

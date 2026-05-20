@@ -1,0 +1,24 @@
+# Cue - CEC TV Control
+# These values are defaults. Override per-host via Semaphore inventory
+# or globally via Semaphore environment variables.
+
+# TV identifier (used in logs and health endpoint)
+tv_id: "tv-unknown"
+
+# API key - required on all requests via X-API-Key header
+# Generate with: openssl rand -hex 32
+api_key: "changeme"
+
+# Port the Pi is plugged into (used for 'as' + input switching on off sequence)
+pi_hdmi_port: 2
+
+# Port the content source is on (switched to at end of on sequence)
+content_hdmi_port: 1
+
+# API port
+api_port: 5000
+
+# Timing (seconds)
+on_delay: 1       # delay between 'on 0' and 'as'
+input_delay: 3    # delay between 'as' and switching to content input
+off_delay: 2      # delay between 'as' and 'standby 0'
