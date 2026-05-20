@@ -1,18 +1,18 @@
 ---
 - name: Deploy Cue
   hosts: '*'
-  become: yes
+  become: true
   become_user: root
 
   tasks:
 
     - name: Update apt cache
-      apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
 
     - name: Install required packages
-      apt:
-        state: latest
+      ansible.builtin.apt:
+        state: present
         update_cache: true
         name:
           - ca-certificates
@@ -25,18 +25,18 @@
           - iptables
 
     - name: Add Docker GPG key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.docker.com/linux/debian/gpg
         state: present
 
     - name: Add Docker repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb [arch=arm64] https://download.docker.com/linux/debian bookworm stable
         state: present
 
     - name: Install Docker packages
-      apt:
-        state: latest
+      ansible.builtin.apt:
+        state: present
         update_cache: true
         name:
           - docker-ce
@@ -46,20 +46,20 @@
           - docker-compose-plugin
 
     - name: Start and enable Docker service
-      service:
+      ansible.builtin.service:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Add user pi to docker group
-      user:
+      ansible.builtin.user:
         name: 'pi'
         groups: docker
-        append: yes
+        append: true
 
     # --- Firewall ---
     - name: Allow port 5000 from Semaphore server only
-      iptables:
+      ansible.builtin.iptables:
         chain: INPUT
         protocol: tcp
         destination_port: "{{ api_port | default(5000) }}"
@@ -67,20 +67,20 @@
         jump: ACCEPT
 
     - name: Block port 5000 from all other sources
-      iptables:
+      ansible.builtin.iptables:
         chain: INPUT
         protocol: tcp
         destination_port: "{{ api_port | default(5000) }}"
         jump: DROP
 
     - name: Save iptables rules
-      shell: iptables-save > /etc/iptables/rules.v4
-      args:
+      ansible.builtin.shell:
+        cmd: iptables-save > /etc/iptables/rules.v4
         creates: /etc/iptables/rules.v4
 
     # --- Project directory ---
     - name: Create directory for Cue
-      file:
+      ansible.builtin.file:
         path: /home/pi/cue
         state: directory
         owner: pi
@@ -88,7 +88,7 @@
         mode: '0755'
 
     - name: Generate config.yml from template
-      template:
+      ansible.builtin.template:
         src: config.yml.j2
         dest: /home/pi/cue/config.yml
         owner: pi
@@ -96,22 +96,25 @@
         mode: '0600'
 
     - name: Copy docker-compose.yml
-      copy:
+      ansible.builtin.copy:
         src: ./docker-compose.yml
         dest: /home/pi/cue/docker-compose.yml
+        mode: '0644'
 
     - name: Pull latest container image
-      command: docker compose pull
-      args:
+      ansible.builtin.command:
+        cmd: docker compose pull
         chdir: /home/pi/cue/
+      changed_when: true
 
     - name: Run the container
-      command: docker compose up -d --force-recreate
-      args:
+      ansible.builtin.command:
+        cmd: docker compose up -d --force-recreate
         chdir: /home/pi/cue/
+      changed_when: true
 
     - name: Ensure container is running
-      docker_container:
+      community.docker.docker_container:
         name: cue
         state: started
         restart_policy: unless-stopped
