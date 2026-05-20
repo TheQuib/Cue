@@ -34,5 +34,5 @@ jobs:
           platforms: linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/cue:latest
-            ghcr.io/${{ github.repository_owner }}/cue:${{ github.ref_name }}
+            ghcr.io/thequib/cue:latest
+            ghcr.io/thequib/cue:${{ github.ref_name }}
