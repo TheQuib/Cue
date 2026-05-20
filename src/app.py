@@ -1,6 +1,5 @@
 import os
 import time
-import subprocess
 import threading
 import logging
 from functools import wraps
