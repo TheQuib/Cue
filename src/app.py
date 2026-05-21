@@ -2,6 +2,7 @@ import os
 import time
 import threading
 import logging
+import subprocess
 from functools import wraps
 from flask import Flask, jsonify, request
 
@@ -132,9 +133,18 @@ def monitor_cec_output():
 
 
 def start_cec_client():
+    global cec_process
 
     log.info("Starting cec-client...")
     try:
+        cec_process = subprocess.Popen(
+            ["cec-client"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
         cec_status["running"] = True
         log.info("cec-client started")
     except Exception as e:
