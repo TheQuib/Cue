@@ -137,7 +137,7 @@ def monitor_cec_output():
 
 
 def start_cec_client():
-
+    global cec_process
     log.info("Starting cec-client...")
     try:
         cec_process = subprocess.Popen(
