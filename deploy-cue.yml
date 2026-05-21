@@ -70,6 +70,13 @@
         append: true
 
     # --- Firewall ---
+    - name: Install netfilter-persistent
+      ansible.builtin.apt:
+        state: present
+        name:
+          - netfilter-persistent
+          - iptables-persistent
+
     - name: Allow port 5000 from Semaphore server only
       ansible.builtin.iptables:
         chain: INPUT
@@ -86,9 +93,9 @@
         jump: DROP
 
     - name: Save iptables rules
-      ansible.builtin.shell:
-        cmd: iptables-save > /etc/iptables/rules.v4
-        creates: /etc/iptables/rules.v4
+      ansible.builtin.command:
+        cmd: netfilter-persistent save
+      changed_when: true
 
     # --- Project directory ---
     - name: Create directory for Cue
