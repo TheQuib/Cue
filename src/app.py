@@ -1,8 +1,8 @@
 import os
 import time
+import subprocess
 import threading
 import logging
-import subprocess
 from functools import wraps
 from flask import Flask, jsonify, request
 
@@ -49,11 +49,14 @@ def require_api_key(f):
     return decorated
 
 
-def send_cec(command: str):
+def send_cec(command: str, force: bool = False):
+    """Write a raw command to the running cec-client process.
+    Set force=True to bypass bus_ready check (e.g. for power on)."""
+    global cec_process, cec_status
     with cec_lock:
         if cec_process is None or cec_process.poll() is not None:
             raise RuntimeError("cec-client is not running")
-        if not cec_status["bus_ready"]:
+        if not force and not cec_status["bus_ready"]:
             raise RuntimeError("CEC bus not ready - TV may be in deep sleep")
         cec_process.stdin.write(f"{command}\n")
         cec_process.stdin.flush()
@@ -68,11 +71,12 @@ def tv_on():
     content_addr = f"1F:82:{content_input}0:00"
 
     log.info("TV ON sequence starting...")
+    # Force send - TV may be in deep sleep, we need to wake it regardless
     send_cec("on 0", force=True)
     time.sleep(on_delay)
-    send_cec("as")
+    send_cec("as", force=True)
     time.sleep(input_delay)
-    send_cec(f"tx {content_addr}")
+    send_cec(f"tx {content_addr}", force=True)
     log.info("TV ON sequence complete")
 
 
@@ -94,6 +98,8 @@ def tv_input(port: int):
 
 
 def monitor_cec_output():
+    global cec_process, cec_status
+
     while True:
         if cec_process is None or cec_process.poll() is not None:
             time.sleep(1)
@@ -133,7 +139,7 @@ def monitor_cec_output():
 
 
 def start_cec_client():
-    global cec_process
+    global cec_process, cec_status
 
     log.info("Starting cec-client...")
     try:
