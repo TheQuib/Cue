@@ -68,7 +68,7 @@ def tv_on():
     content_addr = f"1F:82:{content_input}0:00"
 
     log.info("TV ON sequence starting...")
-    send_cec("on 0")
+    send_cec("on 0", force=True)
     time.sleep(on_delay)
     send_cec("as")
     time.sleep(input_delay)
