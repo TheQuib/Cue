@@ -65,8 +65,8 @@ def send_cec(command: str, force: bool = False):
 def tv_on():
     config = load_config()
     content_input = config.get("content_hdmi_port", 1)
+    bus_wait_timeout = config.get("bus_wait_timeout", 15)
     on_delay = config.get("on_delay", 1)
-    input_delay = config.get("input_delay", 3)
     content_addr = f"1F:82:{content_input}0:00"
 
     log.info("TV ON sequence starting...")
@@ -74,7 +74,17 @@ def tv_on():
     send_cec("on 0", force=True)
     time.sleep(on_delay)
     send_cec("as", force=True)
-    time.sleep(input_delay)
+
+    # Wait for bus to be ready before switching input
+    log.info("Waiting for CEC bus to be ready...")
+    waited = 0
+    while not cec_status["bus_ready"] and waited < bus_wait_timeout:
+        time.sleep(0.5)
+        waited += 0.5
+
+    if not cec_status["bus_ready"]:
+        log.warning("Timed out waiting for CEC bus - input switch may not work")
+
     send_cec(f"tx {content_addr}", force=True)
     log.info("TV ON sequence complete")
 
