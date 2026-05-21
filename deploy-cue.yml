@@ -43,7 +43,7 @@
 
     - name: Add Docker repository
       ansible.builtin.apt_repository:
-        repo: deb [arch=arm64] https://download.docker.com/linux/debian bookworm stable
+        repo: deb [arch=arm64] https://download.docker.com/linux/debian trixie stable
         state: present
 
     - name: Install Docker packages
