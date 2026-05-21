@@ -52,7 +52,6 @@ def require_api_key(f):
 def send_cec(command: str, force: bool = False):
     """Write a raw command to the running cec-client process.
     Set force=True to bypass bus_ready check (e.g. for power on)."""
-    global cec_process, cec_status
     with cec_lock:
         if cec_process is None or cec_process.poll() is not None:
             raise RuntimeError("cec-client is not running")
@@ -98,7 +97,6 @@ def tv_input(port: int):
 
 
 def monitor_cec_output():
-    global cec_process, cec_status
 
     while True:
         if cec_process is None or cec_process.poll() is not None:
@@ -139,7 +137,6 @@ def monitor_cec_output():
 
 
 def start_cec_client():
-    global cec_process, cec_status
 
     log.info("Starting cec-client...")
     try:
