@@ -1,0 +1,89 @@
+baseURL: https://TheQuib.github.io/Cue
+languageCode: en-us
+title: Cue Docs
+theme: hextra
+
+menu:
+  main:
+    - name: Docs
+      pageRef: /docs
+      weight: 1
+
+    - name: About
+      pageRef: /about
+      weight: 2
+
+    - name: Updates
+      pageRef: /blog
+      weight: 3
+
+    - name: Search
+      params:
+        type: search
+      weight: 10
+    - name: GitHub
+      url: "https://github.com/TheQuib/Cue"
+      params:
+        icon: github
+      weight: 11
+
+  sidebar:
+    - identifier: more
+      name: More
+      params:
+        type: separator
+      weight: 1
+    - identifier: cueRepo
+      name: "Cue Repository ↗"
+      url: "https://github.com/TheQuib/Cue"
+      weight: 2
+    - identifier: directorRepo
+      name: "Director Repository ↗"
+      url: "https://github.com/TheQuib/Director"
+    - identifier: quinnHenry
+      name: "Quinn Henry ↗"
+      url: "https://github.com/TheQuib"
+
+enableGitInfo: true
+
+params:
+  displayUpdatedDate: true
+  navbar:
+    displayTitle: true
+    displayLogo: true
+    logo:
+      path: images/rondo-logo-light.svg
+      dark: images/rondo-logo-dark.svg
+      link: /Cue
+      width: 30
+  page:
+    displayPagination: true
+    contextMenu:
+      enable: true
+  blog:
+    article:
+      displayPagination: false
+  banner:
+    key: "docs-annnouncement"
+    message: 🎉 Welcome to the new documentation site! See [this annoucement](/blog/docSite) for more info.
+
+  footer:
+    enable: true
+    displayCopyright: true
+    displayPoweredBy: false
+    width: normal
+
+  editURL:
+    enable: true
+    base: "https://github.com/TheQuib/Cue/edit/main/docs/content"
+
+outputs:
+  page: [html, markdown]
+  section: [html, rss, markdown]
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false

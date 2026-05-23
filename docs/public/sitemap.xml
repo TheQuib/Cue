@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:1313/Cue/about/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/docs/getting-started/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/docs/configuration/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/docs/semaphore/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/docs/api/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/docs/director/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/categories/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/docs/</loc>
+  </url><url>
+    <loc>http://localhost:1313/Cue/tags/</loc>
+  </url>
+</urlset>
