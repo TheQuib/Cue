@@ -19,7 +19,8 @@ cec_lock = threading.Lock()
 cec_status = {
     "running": False,
     "bus_ready": False,
-    "phys_addr": None
+    "phys_addr": None,
+    "active_input": None
 }
 
 
@@ -86,6 +87,7 @@ def tv_on():
         log.warning("Timed out waiting for CEC bus - input switch may not work")
 
     send_cec(f"tx {content_addr}", force=True)
+    cec_status["active_input"] = content_input
     log.info("TV ON sequence complete")
 
 
@@ -97,6 +99,7 @@ def tv_off():
     send_cec("as")
     time.sleep(off_delay)
     send_cec("standby 0")
+    cec_status["active_input"] = None
     log.info("TV OFF sequence complete")
 
 
@@ -104,6 +107,7 @@ def tv_input(port: int):
     addr = f"1F:82:{port}0:00"
     log.info(f"Switching to HDMI {port}...")
     send_cec(f"tx {addr}")
+    cec_status["active_input"] = port
 
 
 def monitor_cec_output():
@@ -175,7 +179,8 @@ def health():
         "tv_id": config.get("tv_id", "unknown"),
         "cec_client": "running" if cec_status["running"] else "stopped",
         "bus_ready": cec_status["bus_ready"],
-        "phys_addr": cec_status["phys_addr"]
+        "phys_addr": cec_status["phys_addr"],
+        "active_input": cec_status["active_input"]
     })
 
 
