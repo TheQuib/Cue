@@ -13,10 +13,6 @@ menu:
       pageRef: /about
       weight: 2
 
-    - name: Updates
-      pageRef: /blog
-      weight: 3
-
     - name: Search
       params:
         type: search
@@ -63,9 +59,6 @@ params:
   blog:
     article:
       displayPagination: false
-  banner:
-    key: "docs-annnouncement"
-    message: 🎉 Welcome to the new documentation site! See [this annoucement](/blog/docSite) for more info.
 
   footer:
     enable: true
