@@ -137,3 +137,60 @@
         name: cue
         state: started
         restart_policy: unless-stopped
+
+    - name: Install fbi for framebuffer image display
+      ansible.builtin.apt:
+        state: present
+        name: fbi
+
+    - name: Check if splash image exists locally
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/splash/splash.png"
+      register: splash_image
+      delegate_to: localhost
+      become: false
+
+    - name: Copy splash image
+      ansible.builtin.copy:
+        src: ./splash/splash.png
+        dest: /home/pi/cue/splash.png
+        owner: pi
+        group: pi
+        mode: '0644'
+      when: splash_image.stat.exists
+
+    - name: Create splash screen systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/cue-splash.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Cue Splash Screen
+          After=multi-user.target
+
+          [Service]
+          Type=simple
+          ExecStartPre=/bin/sh -c 'echo -ne "\033[?25l" > /dev/tty1'
+          ExecStart=/usr/bin/fbi -T 1 -noverbose -a /home/pi/cue/splash.png
+          StandardInput=tty
+          TTYPath=/dev/tty1
+          TTYReset=yes
+          TTYVHangup=yes
+          Restart=always
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+      notify: Reload systemd
+
+    - name: Enable and start splash service
+      ansible.builtin.systemd:
+        name: cue-splash
+        enabled: true
+        state: "{{ 'started' if splash_image.stat.exists else 'stopped' }}"
+        daemon_reload: true
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
