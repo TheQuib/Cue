@@ -138,10 +138,10 @@
         state: started
         restart_policy: unless-stopped
 
-    - name: Install fbi for framebuffer image display
+    - name: Install python3-pil for framebuffer image display
       ansible.builtin.apt:
         state: present
-        name: fbi
+        name: python3-pil
 
     - name: Check if splash image exists locally
       ansible.builtin.stat:
@@ -159,6 +159,14 @@
         mode: '0644'
       when: splash_image.stat.exists
 
+    - name: Copy splash writer script
+      ansible.builtin.copy:
+        src: ./splash/show_splash.py
+        dest: /home/pi/cue/show_splash.py
+        owner: pi
+        group: pi
+        mode: '0755'
+
     - name: Create splash screen systemd service
       ansible.builtin.copy:
         dest: /etc/systemd/system/cue-splash.service
@@ -166,28 +174,29 @@
         content: |
           [Unit]
           Description=Cue Splash Screen
-          After=multi-user.target
+          After=local-fs.target
 
           [Service]
-          Type=simple
-          ExecStartPre=/bin/sh -c 'echo -ne "\033[?25l" > /dev/tty1'
-          ExecStart=/usr/bin/fbi -T 1 -noverbose -a /home/pi/cue/splash.png
-          StandardInput=tty
-          TTYPath=/dev/tty1
-          TTYReset=yes
-          TTYVHangup=yes
-          Restart=always
-          RestartSec=5
+          Type=oneshot
+          RemainAfterExit=yes
+          ExecStartPre=-/bin/sh -c 'echo 0 > /sys/class/graphics/fbcon/cursor_blink'
+          ExecStart=/usr/bin/python3 /home/pi/cue/show_splash.py /home/pi/cue/splash.png
 
           [Install]
           WantedBy=multi-user.target
       notify: Reload systemd
 
+    - name: Reset any previous failed state for splash service
+      ansible.builtin.command:
+        cmd: systemctl reset-failed cue-splash.service
+      failed_when: false
+      changed_when: false
+
     - name: Enable and start splash service
       ansible.builtin.systemd:
         name: cue-splash
         enabled: true
-        state: "{{ 'started' if splash_image.stat.exists else 'stopped' }}"
+        state: "{{ 'restarted' if splash_image.stat.exists else 'stopped' }}"
         daemon_reload: true
 
   handlers:
