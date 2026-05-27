@@ -26,27 +26,33 @@ Director reads from a `config.yml` file. On first launch, it uses the default co
 ### Example config
 
 ```yaml
-location: "Building A - Board Room"
-api_key: "your-api-key"
+location: "My location"
+
+api_key: "changeme"
 
 displays:
-  - id: your-pi-1
-    name: "Left"
+  - id: tv-1
+    name: "Main hallway TV"
     host: 192.168.1.101
     port: 5000
     inputs: [1, 2]
+    content_hdmi_port: 1
 
-  - id: your-pi-2
-    name: "Center"
+  - id: tv-2
+    name: "Office TV"
     host: 192.168.1.102
     port: 5000
     inputs: [1, 2]
 
-  - id: your-pi-3
-    name: "Right"
+  - id: tv-3
+    name: "Conference Room TV"
     host: 192.168.1.103
     port: 5000
     inputs: [1, 2]
+
+input_retry:
+  enabled: false
+  interval: 30
 ```
 
 ### Config reference
@@ -60,6 +66,9 @@ displays:
 | `displays[].host` | IP address of the Pi |
 | `displays[].port` | Port the Cue API is listening on (default: `5000`) |
 | `displays[].inputs` | List of HDMI input numbers to show as buttons |
+| `displays[].content_hdmi_port` | Sets the HDMI port of primary displayed content (Optional)|
+| `input_retry[].enabled` | Enables persistent retries to set the TV source to `displays[].content_hdmi_port` (default: false) |
+| `input_retry[].interval` | Interval at which `input_retry` will send the source command |
 
 ## Using Director
 
@@ -92,3 +101,11 @@ The settings panel also has buttons to open the config file in your system text 
 ## Multiple locations
 
 To use Director in a different location, install it on a machine at that location and configure it with the appropriate Pis. Each instance only knows about the displays in its own config — there is no central server.
+
+## Logs
+
+Director automatically logs commands to and responses from TVs. Click the lines icon on the top right to open the logs pane.
+
+## Feature requests
+
+To request features, please create an [issue](https://github.com/TheQuib/Director/issues) on the Director repository.
