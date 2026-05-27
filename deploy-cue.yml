@@ -179,7 +179,6 @@
           [Service]
           Type=oneshot
           RemainAfterExit=yes
-          ExecStartPre=-/bin/sh -c 'echo 0 > /sys/class/graphics/fbcon/cursor_blink'
           ExecStart=/usr/bin/python3 /home/pi/cue/show_splash.py /home/pi/cue/splash.png
 
           [Install]
