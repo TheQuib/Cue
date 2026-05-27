@@ -69,34 +69,6 @@
         groups: docker
         append: true
 
-    # --- Firewall ---
-    - name: Install netfilter-persistent
-      ansible.builtin.apt:
-        state: present
-        name:
-          - netfilter-persistent
-          - iptables-persistent
-
-    - name: Allow port 5000 from Semaphore server only
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: "{{ api_port | default(5000) }}"
-        source: "{{ semaphore_ip }}"
-        jump: ACCEPT
-
-    - name: Block port 5000 from all other sources
-      ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        destination_port: "{{ api_port | default(5000) }}"
-        jump: DROP
-
-    - name: Save iptables rules
-      ansible.builtin.command:
-        cmd: netfilter-persistent save
-      changed_when: true
-
     # --- Project directory ---
     - name: Create directory for Cue
       ansible.builtin.file:
