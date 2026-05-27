@@ -1,6 +1,6 @@
 ---
 title: API
-weight: 5
+weight: 6
 ---
 
 Cue exposes a small REST API on each Pi. All requests require the `X-API-Key` header.

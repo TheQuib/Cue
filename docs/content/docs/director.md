@@ -1,6 +1,6 @@
 ---
 title: Director
-weight: 6
+weight: 7
 ---
 
 Director is the desktop companion to Cue. It is an Electron app that runs on any machine on your local network and gives you a clean interface for sending commands to one display or all of them at once.
