@@ -6,6 +6,8 @@ import logging
 from functools import wraps
 from flask import Flask, jsonify, request
 
+import show_splash
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
@@ -63,6 +65,19 @@ def send_cec(command: str, force: bool = False):
         log.info(f"Sent CEC command: {command}")
 
 
+def show_splash_on_pi():
+    config = load_config()
+    splash_path = config.get("splash_path", "/app/splash.png")
+    if not os.path.exists(splash_path):
+        log.warning(f"Splash image not found at {splash_path}, skipping")
+        return
+    try:
+        show_splash.display(splash_path)
+        log.info("Splash displayed on framebuffer")
+    except Exception as e:
+        log.warning(f"Splash display failed (non-fatal): {e}")
+
+
 def tv_on():
     config = load_config()
     content_input = config.get("content_hdmi_port", 1)
@@ -74,6 +89,9 @@ def tv_on():
     # Force send - TV may be in deep sleep, we need to wake it regardless
     send_cec("on 0", force=True)
     time.sleep(on_delay)
+    # Refresh splash before asserting active source so it's ready the moment
+    # the TV switches to the Pi's HDMI input.
+    show_splash_on_pi()
     send_cec("as", force=True)
 
     # Wait for bus to be ready before switching input

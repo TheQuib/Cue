@@ -4,8 +4,10 @@ services:
     container_name: cue
     volumes:
       - ./config.yml:/app/config.yml
+      - ./splash.png:/app/splash.png:ro
     devices:
       - "/dev/cec0:/dev/cec0"
+      - "/dev/fb0:/dev/fb0"
     ports:
       - "5000:5000"
     privileged: true
