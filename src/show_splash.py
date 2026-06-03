@@ -4,7 +4,6 @@ No TTY or display server required. The image stays on screen until
 something else writes to the framebuffer.
 """
 
-import os
 import struct
 import sys
 
